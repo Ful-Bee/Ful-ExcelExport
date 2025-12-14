@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ful-ExcelExport Demo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 40px 20px;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 40px;
+      }
+
+      .header h1 {
+        font-size: 3rem;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .header p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+      }
+
+      .header .open-source-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        padding: 4px 16px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-left: 10px;
+        vertical-align: middle;
+      }
+
+      .feature-badges {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+      }
+
+      .feature-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+      }
+
+      .feature-badge.frontend {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+      }
+
+      .feature-badge.data {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+      }
+
+      .feature-badge.memory {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+      }
+
+      .feature-badge .icon {
+        font-size: 1.1rem;
+      }
+
+      .card {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      }
+
+      .card h2 {
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #666;
+        font-weight: 500;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .row {
+        display: flex;
+        gap: 20px;
+      }
+
+      .row .form-group {
+        flex: 1;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 14px 28px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .progress-container {
+        margin-top: 30px;
+        display: none;
+      }
+
+      .progress-container.active {
+        display: block;
+      }
+
+      .progress-bar {
+        height: 20px;
+        background: #e0e0e0;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 15px;
+      }
+
+      .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        width: 0%;
+        transition: width 0.3s;
+        border-radius: 10px;
+      }
+
+      .progress-info {
+        display: flex;
+        justify-content: space-between;
+        color: #666;
+        font-size: 0.9rem;
+      }
+
+      .progress-stage {
+        font-weight: 600;
+        color: #667eea;
+      }
+
+      .progress-message {
+        text-align: center;
+        margin-top: 10px;
+        color: #888;
+      }
+
+      .progress-time {
+        margin-top: 8px;
+        color: #606266;
+        font-size: 12px;
+        text-align: center;
+      }
+
+      .progress-memory {
+        margin-top: 15px;
+        padding-top: 12px;
+        border-top: 1px solid #eee;
+      }
+
+      .memory-bar {
+        height: 8px;
+        background: #e4e7ed;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 8px;
+      }
+
+      .memory-used {
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          #67c23a 0%,
+          #e6a23c 70%,
+          #f56c6c 100%
+        );
+        border-radius: 4px;
+        transition: width 0.3s ease;
+      }
+
+      .memory-text {
+        font-size: 12px;
+        color: #606266;
+        text-align: center;
+      }
+
+      .memory-limit {
+        color: #909399;
+      }
+
+      .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 8px;
+      }
+
+      .feature-item.pro-feature {
+        background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+        border: 1px solid #c4b5fd;
+        cursor: pointer;
+        position: relative;
+      }
+
+      .feature-item.pro-feature:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+
+      .feature-item.pro-feature::after {
+        content: "💎";
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        font-size: 12px;
+      }
+
+      .feature-item.pro-feature small {
+        color: #7c3aed;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .checkbox-item.pro-disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .checkbox-item.pro-disabled:hover {
+        opacity: 0.7;
+      }
+
+      .pro-tag {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white !important;
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 600;
+        margin-left: 4px;
+      }
+
+      /* Pro 悬浮提示 */
+      .pro-tooltip {
+        position: fixed;
+        background: linear-gradient(135deg, #1e1b4b, #312e81);
+        color: white;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+
+      .pro-tooltip.visible {
+        opacity: 1;
+      }
+
+      .pro-tooltip .price {
+        font-size: 18px;
+        font-weight: 700;
+        color: #fbbf24;
+        display: block;
+        margin-top: 4px;
+      }
+
+      .feature-item .icon {
+        font-size: 1.5rem;
+      }
+
+      .feature-item span {
+        color: #333;
+        font-size: 0.9rem;
+      }
+
+      .checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        background: #f8f9fa;
+        border-radius: 8px;
+      }
+
+      .checkbox-item.pro-disabled {
+        background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+        border: 1px solid #d1d5db;
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+
+      .checkbox-item input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #667eea;
+      }
+
+      .debug-log {
+        background: #1e1b4b;
+        color: #a5b4fc;
+        border-radius: 8px;
+        padding: 15px;
+        font-family: "Monaco", "Consolas", monospace;
+        font-size: 12px;
+        max-height: 200px;
+        overflow-y: auto;
+        margin-top: 20px;
+      }
+
+      .debug-log .log-entry {
+        margin-bottom: 4px;
+        padding: 2px 0;
+        border-bottom: 1px solid #312e81;
+      }
+
+      .debug-log .log-entry.success {
+        color: #34d399;
+      }
+
+      .debug-log .log-entry.error {
+        color: #f87171;
+      }
+
+      .debug-log .log-entry.info {
+        color: #60a5fa;
+      }
+
+      .btn-secondary {
+        background: linear-gradient(135deg, #6b7280, #4b5563);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 12px;
+        cursor: pointer;
+        margin-left: 10px;
+      }
+
+      .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(107, 114, 128, 0.4);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lang-switch" style="text-align: right; margin-bottom: 10px;">
+        <a href="demo.en.html" style="color: white; text-decoration: none; padding: 6px 12px; background: rgba(255, 255, 255, 0.2); border-radius: 6px; font-size: 14px;">English</a>
+      </div>
+
+      <div class="header">
+        <h1>📊 Ful-ExcelExport <span class="open-source-badge">开源版</span></h1>
+        <p>100% 纯前端 Excel 导出 · 无需后端服务器</p>
+        <div class="feature-badges">
+          <span class="feature-badge frontend">
+            <span class="icon">🌐</span> 纯前端运行
+          </span>
+          <span class="feature-badge data">
+            <span class="icon">📊</span> 千万级数据
+          </span>
+          <span class="feature-badge memory">
+            <span class="icon">💾</span> 内存稳定 仅占用50MB
+          </span>
+        </div>
+      </div>
+
+      <!-- 技术亮点卡片 -->
+      <div
+        class="card"
+        style="
+          background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+          border: 2px solid #22c55e;
+        "
+      >
+        <h2 style="color: #15803d">
+          🏆 市场唯一：纯前端 + 高性能 + 千万级 + 全样式
+        </h2>
+        <p style="color: #666; margin-bottom: 20px; font-size: 0.95rem">
+          我们是市场上<strong style="color: #15803d">唯一</strong
+          >同时满足「纯前端」「高性能」「千万级数据」「内存稳定」「全样式支持」五个条件的库。
+        </p>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+          "
+        >
+          <div
+            style="
+              padding: 15px;
+              background: white;
+              border-radius: 12px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <div style="font-size: 1.5rem; margin-bottom: 8px">🌐</div>
+            <div style="font-weight: 700; color: #15803d; margin-bottom: 5px">
+              100% 纯前端
+            </div>
+            <div style="color: #666; font-size: 0.9rem">
+              所有处理均在浏览器完成，后端服务器零负担
+            </div>
+          </div>
+          <div
+            style="
+              padding: 15px;
+              background: white;
+              border-radius: 12px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <div style="font-size: 1.5rem; margin-bottom: 8px">📊</div>
+            <div style="font-weight: 700; color: #15803d; margin-bottom: 5px">
+              千万级数据
+            </div>
+            <div style="color: #666; font-size: 0.9rem">
+              SheetJS/ExcelJS 百万行崩溃，本库千万行仅占 50-100MB 内存。
+            </div>
+          </div>
+          <div
+            style="
+              padding: 15px;
+              background: white;
+              border-radius: 12px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <div style="font-size: 1.5rem; margin-bottom: 8px">🎨</div>
+            <div style="font-weight: 700; color: #15803d; margin-bottom: 5px">
+              高度样式还原
+            </div>
+            <div style="color: #666; font-size: 0.9rem">
+              完整支持背景色、字体、边框、对齐、富文本等，导出与页面一致。
+            </div>
+          </div>
+        </div>
+        <!-- 对比表格 -->
+        <div style="margin-top: 20px; overflow-x: auto">
+          <table
+            style="
+              width: 100%;
+              border-collapse: collapse;
+              font-size: 0.9rem;
+              background: white;
+              border-radius: 8px;
+              overflow: hidden;
+            "
+          >
+            <thead>
+              <tr style="background: #15803d; color: white">
+                <th style="padding: 12px; text-align: left">库</th>
+                <th style="padding: 12px; text-align: center">纯前端</th>
+                <th style="padding: 12px; text-align: center">高性能导出</th>
+                <th style="padding: 12px; text-align: center">千万级</th>
+                <th style="padding: 12px; text-align: center">内存稳定</th>
+                <th style="padding: 12px; text-align: center">完整样式</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid #e5e7eb">
+                <td style="padding: 10px">SheetJS</td>
+                <td style="padding: 10px; text-align: center">✅</td>
+                <td style="padding: 10px; text-align: center">❌</td>
+                <td style="padding: 10px; text-align: center">❌</td>
+                <td style="padding: 10px; text-align: center">❌</td>
+                <td style="padding: 10px; text-align: center">💰付费</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e7eb">
+                <td style="padding: 10px">ExcelJS</td>
+                <td style="padding: 10px; text-align: center">⚠️</td>
+                <td style="padding: 10px; text-align: center">⚠️</td>
+                <td style="padding: 10px; text-align: center">❌</td>
+                <td style="padding: 10px; text-align: center">❌</td>
+                <td style="padding: 10px; text-align: center">✅</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e7eb">
+                <td style="padding: 10px">xlsx-stream</td>
+                <td style="padding: 10px; text-align: center">❌</td>
+                <td style="padding: 10px; text-align: center">✅</td>
+                <td style="padding: 10px; text-align: center">✅</td>
+                <td style="padding: 10px; text-align: center">✅</td>
+                <td style="padding: 10px; text-align: center">❌</td>
+              </tr>
+              <tr style="background: #dcfce7; font-weight: 700">
+                <td style="padding: 10px; color: #15803d">Ful-ExcelExport</td>
+                <td style="padding: 10px; text-align: center">✅</td>
+                <td style="padding: 10px; text-align: center">✅</td>
+                <td style="padding: 10px; text-align: center">✅</td>
+                <td style="padding: 10px; text-align: center">✅</td>
+                <td style="padding: 10px; text-align: center">✅</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- 特点说明 -->
+        <div
+          style="
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #15803d;
+          "
+        >
+          <div style="font-weight: 700; color: #15803d; margin-bottom: 8px">
+            ✨ 开箱即用
+          </div>
+          <div style="font-size: 0.9rem; color: #666">
+            <strong>零依赖安装</strong> - 只需
+            <code
+              style="background: #f3f4f6; padding: 2px 6px; border-radius: 4px"
+              >npm install ful-excel-export</code
+            >，无需安装任何其他包。 所有功能已内置，直接使用即可。
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>📝 导出配置</h2>
+
+        <div class="row">
+          <div class="form-group">
+            <label>数据行数</label>
+            <select id="rowCount">
+              <option value="100">100 行（测试）</option>
+              <option value="1000">1,000 行</option>
+              <option value="10000">10,000 行</option>
+              <option value="100000" selected>100,000 行（十万）</option>
+              <option value="1000000">1,000,000 行（百万级）</option>
+              <option value="5000000">5,000,000 行（五百万）</option>
+              <option value="10000000">10,000,000 行（千万级）</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>列数</label>
+            <select id="colCount">
+              <option value="5">5 列</option>
+              <option value="10" selected>10 列</option>
+              <option value="20">20 列</option>
+              <option value="50">50 列</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>文件名</label>
+          <input type="text" id="fileName" value="demo-export.xlsx" />
+        </div>
+
+        <div class="form-group">
+          <label
+            >功能开关
+            <small style="color: #666"
+              >（勾选后在数据开头插入演示行）</small
+            ></label
+          >
+          <div class="checkbox-group">
+            <label
+              class="checkbox-item"
+              title="背景色、字体颜色、粗体、斜体、边框、对齐、字号"
+            >
+              <input type="checkbox" id="includeStyles" checked />
+              <span
+                >🎨 单元格样式
+                <small style="color: #888"
+                  >背景/颜色/粗体/斜体/边框/对齐</small
+                ></span
+              >
+            </label>
+            <label
+              class="checkbox-item"
+              title="支持 <b> <i> <u> <s> <br> 标签及 style 属性"
+            >
+              <input type="checkbox" id="includeRichText" checked />
+              <span
+                >📝 富文本
+                <small style="color: #888">HTML标签 + style</small></span
+              >
+            </label>
+            <label
+              class="checkbox-item pro-disabled pro-feature"
+              data-pro="hyperlink"
+              title="💎 Pro 功能 - 联系获取报价"
+            >
+              <input type="checkbox" disabled />
+              <span
+                >🔗 超链接 <small class="pro-tag">Pro</small>
+                <small style="color: #888">mailto/http</small></span
+              >
+            </label>
+            <label 
+              class="checkbox-item pro-disabled pro-feature" 
+              data-pro="merge"
+              title="💎 Pro 功能 - 联系获取报价"
+            >
+              <input type="checkbox" disabled />
+              <span
+                >📊 合并单元格 <small class="pro-tag">Pro</small>
+                <small style="color: #888">rowSpan/colSpan</small></span
+              >
+            </label>
+            <label 
+              class="checkbox-item pro-disabled pro-feature" 
+              data-pro="rowcol"
+              title="💎 Pro 功能 - 联系获取报价"
+            >
+              <input type="checkbox" disabled />
+              <span
+                >📐 行高列宽 <small class="pro-tag">Pro</small>
+                <small style="color: #888">height/width</small></span
+              >
+            </label>
+            <label 
+              class="checkbox-item pro-disabled pro-feature" 
+              data-pro="image"
+              title="💎 Pro 功能 - 联系获取报价"
+            >
+              <input type="checkbox" disabled />
+              <span
+                >🖼️ 图片嵌入 <small class="pro-tag">Pro</small>
+                <small style="color: #888">base64</small></span
+              >
+            </label>
+          </div>
+          <div
+            style="
+              margin-top: 8px;
+              padding: 8px 12px;
+              background: #fef3c7;
+              border-radius: 6px;
+              font-size: 12px;
+              color: #92400e;
+            "
+          >
+            💡
+            勾选功能后，会在<strong>数据开头</strong>插入演示行（每项3行），覆盖各种效果
+          </div>
+        </div>
+
+        <!-- Pro 悬浮提示 -->
+        <div class="pro-tooltip" id="proTooltip">
+          <div id="proTooltipText">解锁高级功能</div>
+          <span class="price">¥4999 / 永久授权</span>
+        </div>
+
+        <button class="btn btn-primary" id="exportBtn" onclick="startExport()">
+          🚀 开始导出
+        </button>
+        <button class="btn btn-secondary" onclick="clearLog()">
+          🗑️ 清空日志
+        </button>
+
+        <div class="progress-container" id="progressContainer">
+          <div class="progress-bar">
+            <div class="progress-bar-fill" id="progressFill"></div>
+          </div>
+          <div class="progress-info">
+            <span class="progress-stage" id="progressStage">准备中...</span>
+            <span id="progressPercent">0%</span>
+          </div>
+          <div class="progress-message" id="progressMessage">正在初始化...</div>
+          <div class="progress-time" id="progressTime" style="display: none">
+            已用时: 0s
+          </div>
+          <div
+            class="progress-memory"
+            id="progressMemory"
+            style="display: none"
+          >
+            <div class="memory-bar">
+              <div class="memory-used" id="memoryUsed" style="width: 0%"></div>
+            </div>
+            <div class="memory-text">
+              内存: <span id="memUsedHeap">0</span>MB /
+              <span id="memTotalHeap">0</span>MB
+              <span class="memory-limit"
+                >(限制: <span id="memLimit">0</span>MB)</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="debug-log" id="debugLog">
+          <div class="log-entry info">[系统] Demo 调试环境已加载</div>
+        </div>
+      </div>
+
+      <!-- 商业合作卡片 -->
+      <div
+        class="card"
+        style="
+          background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+          border: 2px solid #f59e0b;
+        "
+      >
+        <h2 style="color: #b45309">💼 商业合作 & 技术咨询</h2>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+          "
+        >
+          <!-- Pro 专业版 -->
+          <div
+            style="
+              padding: 20px;
+              background: white;
+              border-radius: 12px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              text-align: center;
+            "
+          >
+            <div style="font-size: 2rem; margin-bottom: 10px">🚀</div>
+            <div
+              style="
+                font-weight: 700;
+                color: #b45309;
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+              "
+            >
+              Pro 专业版
+            </div>
+            <ul
+              style="
+                text-align: left;
+                color: #666;
+                font-size: 0.9rem;
+                padding-left: 20px;
+                margin-bottom: 15px;
+              "
+            >
+              <li>✅ 自定义行高列宽</li>
+              <li>✅ 图片嵌入</li>
+              <li>✅ 超链接</li>
+              <li>✅ 技术支持</li>
+            </ul>
+            <div style="color: #b45309; font-weight: 600">联系获取报价<br/>📧 634688344@qq.com</div>
+          </div>
+          <!-- 技术咨询 -->
+          <div
+            style="
+              padding: 20px;
+              background: white;
+              border-radius: 12px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              text-align: center;
+            "
+          >
+            <div style="font-size: 2rem; margin-bottom: 10px">💬</div>
+            <div
+              style="
+                font-weight: 700;
+                color: #b45309;
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+              "
+            >
+              技术咨询
+            </div>
+            <ul
+              style="
+                text-align: left;
+                color: #666;
+                font-size: 0.9rem;
+                padding-left: 20px;
+                margin-bottom: 15px;
+              "
+            >
+              <li>📊 大数据导出方案设计</li>
+              <li>🔧 定制功能开发</li>
+              <li>📚 技术培训</li>
+            </ul>
+            <div style="color: #b45309; font-weight: 600">扫码咨询 ↓</div>
+            <div style="margin-top: 15px; text-align: center;">
+              <img src="./assets/user/wechat.jpg" width="150" style="border-radius: 8px;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 捐赠卡片 -->
+      <div
+        class="card"
+        style="
+          background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+          border: 2px solid #ec4899;
+        "
+      >
+        <h2 style="color: #be185d">☕ 支持项目</h2>
+        <p style="color: #9d174d; margin-bottom: 20px">
+          如果这个项目对你有帮助，欢迎支持一下！你的鼓励是我持续改进的动力 💪
+        </p>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+          "
+        >
+          <!-- Star -->
+          <div
+            style="
+              padding: 20px;
+              background: white;
+              border-radius: 12px;
+              text-align: center;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <div style="font-size: 2rem; margin-bottom: 10px">⭐</div>
+            <div style="font-weight: 700; color: #be185d; margin-bottom: 10px">
+              给个 Star
+            </div>
+            <div style="color: #666; font-size: 0.85rem; margin-bottom: 15px">
+              最简单的支持方式
+            </div>
+            <a
+              href="https://github.com/fulbee/Ful-ExcelExport"
+              target="_blank"
+              style="
+                display: inline-block;
+                padding: 8px 20px;
+                background: #be185d;
+                color: white;
+                text-decoration: none;
+                border-radius: 20px;
+                font-size: 0.9rem;
+              "
+              >前往 GitHub ⭐</a
+            >
+          </div>
+          <!-- 支付宝 -->
+          <div
+            style="
+              padding: 20px;
+              background: white;
+              border-radius: 12px;
+              text-align: center;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <div style="font-size: 2rem; margin-bottom: 10px">💰</div>
+            <div style="font-weight: 700; color: #be185d; margin-bottom: 10px">
+              请我喝杯咖啡
+            </div>
+            <div style="margin-top: 10px; text-align: center;">
+              <img src="./assets/user/aliPay.jpg" width="150" style="border-radius: 8px;" />
+            </div>
+          </div>
+        </div>
+        <p
+          style="
+            text-align: center;
+            margin-top: 20px;
+            color: #9d174d;
+            font-size: 0.9rem;
+          "
+        >
+          每一个 Star 和赞赏都是莫大的鼓励！🙏
+        </p>
+      </div>
+    </div>
+
+    <script type="module">
+      // Demo - 免费版功能演示
+      import FulExcelExport from "./ful-excel-export.esm.js";
+
+      // 日志函数
+      function log(message, type = "info") {
+        const debugLog = document.getElementById("debugLog");
+        const entry = document.createElement("div");
+        entry.className = `log-entry ${type}`;
+        const time = new Date().toLocaleTimeString();
+        entry.textContent = `[${time}] ${message}`;
+        debugLog.appendChild(entry);
+        debugLog.scrollTop = debugLog.scrollHeight;
+        console.log(`[${type}] ${message}`);
+      }
+
+      window.clearLog = function () {
+        document.getElementById("debugLog").innerHTML =
+          '<div class="log-entry info">[系统] 日志已清空</div>';
+      };
+
+      log("Demo 调试环境已就绪", "success");
+
+      // Pro 功能悬浮提示
+      const proFeatures = {
+        hyperlink:
+          "🔗 超链接功能：为单元格添加可点击链接，支持网页、邮件、内部跳转",
+        merge: "📐 单元格合并：灵活合并任意区域的单元格，制作专业报表",
+        rowcol: "📏 行高列宽：精确控制行高和列宽，完美呈现数据",
+        image: "🖼️ 图片嵌入：支持将图片嵌入到 Excel 单元格中",
+      };
+
+      const tooltip = document.getElementById("proTooltip");
+      const tooltipText = document.getElementById("proTooltipText");
+
+      document.querySelectorAll(".pro-feature").forEach((el) => {
+        el.addEventListener("mouseenter", (e) => {
+          const feature = el.dataset.pro;
+          tooltipText.textContent = proFeatures[feature] || "Pro 专业版功能";
+          tooltip.classList.add("visible");
+        });
+
+        el.addEventListener("mousemove", (e) => {
+          tooltip.style.left = e.clientX + 15 + "px";
+          tooltip.style.top = e.clientY + 15 + "px";
+        });
+
+        el.addEventListener("mouseleave", () => {
+          tooltip.classList.remove("visible");
+        });
+
+        el.addEventListener("click", () => {
+          alert(
+            "💎 Pro 专业版功能\n\n包含：超链接、单元格合并、行高列宽、图片嵌入\n\n联系获取报价：634688344@qq.com"
+          );
+        });
+      });
+
+      window.startExport = async function () {
+        const rowCount = parseInt(document.getElementById("rowCount").value);
+        const colCount = parseInt(document.getElementById("colCount").value);
+        const fileName =
+          document.getElementById("fileName").value || "export.xlsx";
+        const includeStyles = document.getElementById("includeStyles").checked;
+        const includeRichText =
+          document.getElementById("includeRichText").checked;
+
+        const btn = document.getElementById("exportBtn");
+        const progressContainer = document.getElementById("progressContainer");
+        const progressFill = document.getElementById("progressFill");
+        const progressStage = document.getElementById("progressStage");
+        const progressPercent = document.getElementById("progressPercent");
+        const progressMessage = document.getElementById("progressMessage");
+        const progressTime = document.getElementById("progressTime");
+        const progressMemory = document.getElementById("progressMemory");
+        const memoryUsed = document.getElementById("memoryUsed");
+        const memUsedHeap = document.getElementById("memUsedHeap");
+        const memTotalHeap = document.getElementById("memTotalHeap");
+        const memLimit = document.getElementById("memLimit");
+
+        btn.disabled = true;
+        btn.textContent = "⏳ 导出中...";
+        progressContainer.classList.add("active");
+        progressTime.style.display = "block";
+        progressMemory.style.display = "block";
+
+        // 计时器
+        const startTime = Date.now();
+        const timer = setInterval(() => {
+          const elapsed = Math.floor((Date.now() - startTime) / 1000);
+          const minutes = Math.floor(elapsed / 60);
+          const seconds = elapsed % 60;
+          progressTime.textContent =
+            minutes > 0
+              ? `已用时: ${minutes}m ${seconds}s`
+              : `已用时: ${seconds}s`;
+        }, 1000);
+
+        // 数据源
+        const colNames = [
+          "姓名",
+          "年龄",
+          "部门",
+          "职位",
+          "工号",
+          "入职日期",
+          "薪资",
+          "邮箱",
+          "电话",
+          "地址",
+          "学历",
+          "专业",
+          "籍贯",
+          "民族",
+          "政治面貌",
+          "婚姻状况",
+          "紧急联系人",
+          "紧急电话",
+          "备注1",
+          "备注2",
+        ];
+        const departments = [
+          "技术部",
+          "产品部",
+          "设计部",
+          "市场部",
+          "财务部",
+          "人事部",
+        ];
+        const names = [
+          "张三",
+          "李四",
+          "王五",
+          "赵六",
+          "钱七",
+          "孙八",
+          "周九",
+          "吴十",
+        ];
+        const positions = ["工程师", "经理", "总监", "专员", "主管", "助理"];
+
+        log(`开始导出: ${rowCount.toLocaleString()} 行 × ${colCount} 列`);
+        log(`文件名: ${fileName}`);
+        log(`样式: ${includeStyles ? "✓" : "✗"} | 富文本: ${includeRichText ? "✓" : "✗"}`);
+
+        // 创建导出器实例
+        const exporter = new FulExcelExport({ fileName });
+        log("导出器已创建");
+
+        // 添加工作表
+        const worksheet = exporter.addWorkSheet({
+          name: "数据",
+          columnCount: colCount,
+        });
+        log(`工作表已创建: ${worksheet.name}`);
+
+        // 生成表头行
+        const headerRowData = [];
+        for (let i = 0; i < colCount; i++) {
+          const cell = { value: colNames[i] || `列${i + 1}` };
+          if (includeStyles) {
+            cell.bold = true;
+            cell.fill = "#4472C4";
+            cell.color = "#FFFFFF";
+            cell.align = "center";
+          }
+          headerRowData.push(cell);
+        }
+
+        // 生成普通数据行
+        function generateRow(i) {
+          const row = [];
+          const name = names[i % names.length];
+          const age = 20 + (i % 40);
+          const dept = departments[i % departments.length];
+          const pos = positions[i % positions.length];
+          const email = `${name}${i}@company.com`;
+
+          for (let col = 0; col < colCount; col++) {
+            let cell = {};
+            switch (col) {
+              case 0:
+                cell = { value: `${name}${i}` };
+                if (includeStyles && i % 5 === 0) {
+                  cell.fill = "#FFFF00";
+                  cell.bold = true;
+                }
+                break;
+              case 1:
+                cell = { value: age };
+                if (includeStyles && age > 40) {
+                  cell.color = "#FF0000";
+                }
+                break;
+              case 2:
+                cell = { value: dept };
+                break;
+              case 3:
+                cell = { value: pos };
+                if (includeStyles) {
+                  cell.italic = true;
+                }
+                break;
+              case 4:
+                cell = { value: `EMP${String(i).padStart(6, "0")}` };
+                if (includeStyles) {
+                  cell.fontFamily = "Courier New";
+                }
+                break;
+              case 5:
+                cell = {
+                  value: `2020-${String((i % 12) + 1).padStart(2, "0")}-${String((i % 28) + 1).padStart(2, "0")}`,
+                };
+                break;
+              case 6:
+                cell = { value: 5000 + (i % 20) * 1000 };
+                if (includeStyles) {
+                  cell.border = true;
+                  cell.align = "right";
+                }
+                break;
+              case 7:
+                if (includeRichText && i % 10 === 0) {
+                  cell = { value: `<b>${email}</b>` };
+                } else {
+                  cell = { value: email };
+                }
+                break;
+              case 8:
+                cell = { value: `138${String(i).padStart(8, "0").slice(-8)}` };
+                break;
+              case 9:
+                if (includeRichText && i % 7 === 0) {
+                  cell = { value: `<i>北京市朝阳区${i}号</i>` };
+                } else {
+                  cell = { value: `北京市朝阳区${i}号` };
+                }
+                break;
+              default:
+                cell = { value: `数据${col}-${i}` };
+            }
+            row.push(cell);
+          }
+          return row;
+        }
+
+        // 进度回调
+        exporter.onProgress((percent, stage, message, memory) => {
+          progressFill.style.width = percent + "%";
+          progressPercent.textContent = percent + "%";
+
+          const stageNames = {
+            init: "初始化",
+            building: "生成中",
+            compressing: "压缩中",
+            done: "完成",
+            error: "错误",
+          };
+          progressStage.textContent = stageNames[stage] || stage;
+          progressMessage.textContent = message;
+          log(`${stageNames[stage] || stage}: ${message}`);
+
+          if (memory) {
+            const usedHeap = parseFloat(memory.usedHeap) || 0;
+            const totalHeap = parseFloat(memory.totalHeap) || 0;
+            const limit = parseFloat(memory.limit) || totalHeap;
+            const memPercent = limit > 0 ? Math.min(100, (usedHeap / limit) * 100) : 0;
+
+            memUsedHeap.textContent = usedHeap;
+            memTotalHeap.textContent = totalHeap;
+            memLimit.textContent = limit;
+            memoryUsed.style.width = memPercent + "%";
+          }
+        });
+
+        try {
+          const PAGE_SIZE = 1000;
+          const totalPages = Math.ceil((rowCount + 1) / PAGE_SIZE); // +1 for header
+          log(`分页数: ${totalPages} 页 (每页 ${PAGE_SIZE} 行)`);
+
+          // 分页生成并写入数据
+          for (let page = 0; page < totalPages; page++) {
+            const pageData = [];
+            const startIdx = page * PAGE_SIZE;
+            const endIdx = Math.min(startIdx + PAGE_SIZE, rowCount + 1);
+
+            for (let idx = startIdx; idx < endIdx; idx++) {
+              if (idx === 0) {
+                pageData.push(headerRowData);
+              } else {
+                pageData.push(generateRow(idx - 1));
+              }
+            }
+
+            await worksheet.addRows(pageData);
+            
+            // 每10页输出一次日志
+            if ((page + 1) % 10 === 0 || page === totalPages - 1) {
+              log(`已写入 ${page + 1} / ${totalPages} 页`);
+            }
+          }
+          log("数据写入完成", "success");
+
+          log("开始压缩导出...");
+          const result = await exporter.export();
+
+          console.log("导出成功:", result);
+          log(`✅ 导出成功！行数: ${result.rows.toLocaleString()}, 大小: ${result.sizeMB}MB`, "success");
+          alert(
+            `导出成功！\n行数: ${result.rows.toLocaleString()}\n工作表: ${
+              result.sheets
+            }\n文件大小: ${result.sizeMB} MB`
+          );
+        } catch (error) {
+          console.error("导出失败:", error);
+          log(`❌ 导出失败: ${error.message}`, "error");
+          alert("导出失败: " + error.message);
+        } finally {
+          clearInterval(timer);
+          btn.disabled = false;
+          btn.textContent = "🚀 开始导出";
+        }
+      };
+    </script>
+  </body>
+</html>

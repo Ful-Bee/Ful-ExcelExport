@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ful-ExcelExport Demo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 40px 20px;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .lang-switch {
+        text-align: right;
+        margin-bottom: 10px;
+      }
+
+      .lang-switch a {
+        color: white;
+        text-decoration: none;
+        padding: 6px 12px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        font-size: 14px;
+        transition: background 0.3s;
+      }
+
+      .lang-switch a:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 40px;
+      }
+
+      .header h1 {
+        font-size: 3rem;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .header p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+      }
+
+      .header .open-source-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        padding: 4px 16px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-left: 10px;
+        vertical-align: middle;
+      }
+
+      .feature-badges {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+      }
+
+      .feature-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+      }
+
+      .feature-badge.frontend {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+      }
+
+      .feature-badge.data {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+      }
+
+      .feature-badge.memory {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+      }
+
+      .feature-badge .icon {
+        font-size: 1.1rem;
+      }
+
+      .card {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      }
+
+      .card h2 {
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #666;
+        font-weight: 500;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .row {
+        display: flex;
+        gap: 20px;
+      }
+
+      .row .form-group {
+        flex: 1;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 14px 28px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .progress-container {
+        margin-top: 30px;
+        display: none;
+      }
+
+      .progress-container.active {
+        display: block;
+      }
+
+      .progress-bar {
+        height: 20px;
+        background: #e0e0e0;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 15px;
+      }
+
+      .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        width: 0%;
+        transition: width 0.3s;
+        border-radius: 10px;
+      }
+
+      .progress-info {
+        display: flex;
+        justify-content: space-between;
+        color: #666;
+        font-size: 0.9rem;
+      }
+
+      .progress-stage {
+        font-weight: 600;
+        color: #667eea;
+      }
+
+      .progress-message {
+        text-align: center;
+        margin-top: 10px;
+        color: #888;
+      }
+
+      .progress-time {
+        margin-top: 8px;
+        color: #606266;
+        font-size: 12px;
+        text-align: center;
+      }
+
+      .progress-memory {
+        margin-top: 15px;
+        padding-top: 12px;
+        border-top: 1px solid #eee;
+      }
+
+      .memory-bar {
+        height: 8px;
+        background: #e4e7ed;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 8px;
+      }
+
+      .memory-used {
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          #67c23a 0%,
+          #e6a23c 70%,
+          #f56c6c 100%
+        );
+        border-radius: 4px;
+        transition: width 0.3s ease;
+      }
+
+      .memory-text {
+        font-size: 12px;
+        color: #606266;
+        text-align: center;
+      }
+
+      .memory-limit {
+        color: #909399;
+      }
+
+      .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 8px;
+      }
+
+      .feature-item.pro-feature {
+        background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+        border: 1px solid #c4b5fd;
+        cursor: pointer;
+        position: relative;
+      }
+
+      .feature-item.pro-feature:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+
+      .feature-item.pro-feature::after {
+        content: "💎";
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        font-size: 12px;
+      }
+
+      .feature-item.pro-feature small {
+        color: #7c3aed;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .checkbox-item.pro-disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .checkbox-item.pro-disabled:hover {
+        opacity: 0.7;
+      }
+
+      .pro-tag {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white !important;
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 600;
+        margin-left: 4px;
+      }
+
+      .pro-tooltip {
+        position: fixed;
+        background: linear-gradient(135deg, #1e1b4b, #312e81);
+        color: white;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+
+      .pro-tooltip.visible {
+        opacity: 1;
+      }
+
+      .pro-tooltip .price {
+        font-size: 18px;
+        font-weight: 700;
+        color: #fbbf24;
+        display: block;
+        margin-top: 4px;
+      }
+
+      .feature-item .icon {
+        font-size: 1.5rem;
+      }
+
+      .feature-item span {
+        color: #333;
+        font-size: 0.9rem;
+      }
+
+      .checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .checkbox-item input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #667eea;
+      }
+
+      .debug-log {
+        background: #1e1b4b;
+        color: #a5b4fc;
+        border-radius: 8px;
+        padding: 15px;
+        font-family: "Monaco", "Consolas", monospace;
+        font-size: 12px;
+        max-height: 200px;
+        overflow-y: auto;
+        margin-top: 20px;
+      }
+
+      .debug-log .log-entry {
+        margin-bottom: 4px;
+        padding: 2px 0;
+        border-bottom: 1px solid #312e81;
+      }
+
+      .debug-log .log-entry.success {
+        color: #34d399;
+      }
+
+      .debug-log .log-entry.error {
+        color: #f87171;
+      }
+
+      .debug-log .log-entry.info {
+        color: #60a5fa;
+      }
+
+      .btn-secondary {
+        background: linear-gradient(135deg, #6b7280, #4b5563);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 12px;
+        cursor: pointer;
+        margin-left: 10px;
+      }
+
+      .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(107, 114, 128, 0.4);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lang-switch">
+        <a href="demo.html">中文</a>
+      </div>
+
+      <div class="header">
+        <h1>📊 Ful-ExcelExport <span class="open-source-badge">Open Source</span></h1>
+        <p>100% Pure Frontend Excel Export · No Backend Required</p>
+        <div class="feature-badges">
+          <span class="feature-badge frontend">
+            <span class="icon">🌐</span> Pure Frontend
+          </span>
+          <span class="feature-badge data">
+            <span class="icon">📊</span> 10M+ Rows
+          </span>
+          <span class="feature-badge memory">
+            <span class="icon">💾</span> Stable Memory ~50MB
+          </span>
+        </div>
+      </div>
+
+      <!-- Technical Highlights Card -->
+      <div
+        class="card"
+        style="
+          background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+          border: 2px solid #22c55e;
+        "
+      >
+        <h2 style="color: #15803d">
+          🏆 Market Unique: Pure Frontend + High Performance + 10M+ Rows + Full Styles
+        </h2>
+        <p style="color: #666; margin-bottom: 20px; font-size: 0.95rem">
+          We are the <strong style="color: #15803d">only</strong> library that simultaneously meets all five conditions: Pure Frontend, High Performance, 10M+ Data, Stable Memory, Full Style Support.
+        </p>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+          "
+        >
+          <div
+            style="
+              padding: 15px;
+              background: white;
+              border-radius: 12px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <div style="font-size: 1.5rem; margin-bottom: 8px">🌐</div>
+            <div style="font-weight: 700; color: #15803d; margin-bottom: 5px">
+              100% Pure Frontend
+            </div>
+            <div style="color: #666; font-size: 0.9rem">
+              All processing done in browser, zero backend server load.
+            </div>
+          </div>
+          <div
+            style="
+              padding: 15px;
+              background: white;
+              border-radius: 12px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <div style="font-size: 1.5rem; margin-bottom: 8px">📊</div>
+            <div style="font-weight: 700; color: #15803d; margin-bottom: 5px">
+              10 Million+ Rows
+            </div>
+            <div style="color: #666; font-size: 0.9rem">
+              SheetJS/ExcelJS crash at 1M rows. This library handles 10M+ with only 50-100MB memory.
+            </div>
+          </div>
+          <div
+            style="
+              padding: 15px;
+              background: white;
+              border-radius: 12px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <div style="font-size: 1.5rem; margin-bottom: 8px">🎨</div>
+            <div style="font-weight: 700; color: #15803d; margin-bottom: 5px">
+              Full Style Support
+            </div>
+            <div style="color: #666; font-size: 0.9rem">
+              Complete support for backgrounds, fonts, borders, alignment, rich text - exports match your page.
+            </div>
+          </div>
+        </div>
+        <!-- Comparison Table -->
+        <div style="margin-top: 20px; overflow-x: auto">
+          <table
+            style="
+              width: 100%;
+              border-collapse: collapse;
+              font-size: 0.9rem;
+              background: white;
+              border-radius: 8px;
+              overflow: hidden;
+            "
+          >
+            <thead>
+              <tr style="background: #15803d; color: white">
+                <th style="padding: 12px; text-align: left">Library</th>
+                <th style="padding: 12px; text-align: center">Pure Frontend</th>
+                <th style="padding: 12px; text-align: center">High Perf</th>
+                <th style="padding: 12px; text-align: center">10M+ Rows</th>
+                <th style="padding: 12px; text-align: center">Stable Memory</th>
+                <th style="padding: 12px; text-align: center">Full Styles</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid #e5e7eb">
+                <td style="padding: 10px">SheetJS</td>
+                <td style="padding: 10px; text-align: center">✅</td>
+                <td style="padding: 10px; text-align: center">❌</td>
+                <td style="padding: 10px; text-align: center">❌</td>
+                <td style="padding: 10px; text-align: center">❌</td>
+                <td style="padding: 10px; text-align: center">💰 Paid</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e7eb">
+                <td style="padding: 10px">ExcelJS</td>
+                <td style="padding: 10px; text-align: center">⚠️</td>
+                <td style="padding: 10px; text-align: center">⚠️</td>
+                <td style="padding: 10px; text-align: center">❌</td>
+                <td style="padding: 10px; text-align: center">❌</td>
+                <td style="padding: 10px; text-align: center">✅</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e7eb">
+                <td style="padding: 10px">xlsx-stream</td>
+                <td style="padding: 10px; text-align: center">❌</td>
+                <td style="padding: 10px; text-align: center">✅</td>
+                <td style="padding: 10px; text-align: center">✅</td>
+                <td style="padding: 10px; text-align: center">✅</td>
+                <td style="padding: 10px; text-align: center">❌</td>
+              </tr>
+              <tr style="background: #dcfce7; font-weight: 700">
+                <td style="padding: 10px; color: #15803d">Ful-ExcelExport</td>
+                <td style="padding: 10px; text-align: center">✅</td>
+                <td style="padding: 10px; text-align: center">✅</td>
+                <td style="padding: 10px; text-align: center">✅</td>
+                <td style="padding: 10px; text-align: center">✅</td>
+                <td style="padding: 10px; text-align: center">✅</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Features -->
+        <div
+          style="
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #15803d;
+          "
+        >
+          <div style="font-weight: 700; color: #15803d; margin-bottom: 8px">
+            ✨ Ready to Use
+          </div>
+          <div style="font-size: 0.9rem; color: #666">
+            <strong>Zero Dependencies</strong> - Just
+            <code
+              style="background: #f3f4f6; padding: 2px 6px; border-radius: 4px"
+              >npm install ful-excel-export</code
+            >, no additional packages needed. All features built-in.
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>📝 Export Configuration</h2>
+
+        <div class="row">
+          <div class="form-group">
+            <label>Row Count</label>
+            <select id="rowCount">
+              <option value="100">100 rows (test)</option>
+              <option value="1000">1,000 rows</option>
+              <option value="10000">10,000 rows</option>
+              <option value="100000" selected>100,000 rows</option>
+              <option value="1000000">1,000,000 rows</option>
+              <option value="5000000">5,000,000 rows</option>
+              <option value="10000000">10,000,000 rows</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Column Count</label>
+            <select id="colCount">
+              <option value="5">5 columns</option>
+              <option value="10" selected>10 columns</option>
+              <option value="20">20 columns</option>
+              <option value="50">50 columns</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>File Name</label>
+          <input type="text" id="fileName" value="demo-export.xlsx" />
+        </div>
+
+        <div class="form-group">
+          <label
+            >Feature Toggles
+            <small style="color: #666"
+              >(demo rows will be inserted at the beginning)</small
+            ></label
+          >
+          <div class="checkbox-group">
+            <label
+              class="checkbox-item"
+              title="Background, font color, bold, italic, border, alignment, font size"
+            >
+              <input type="checkbox" id="includeStyles" checked />
+              <span
+                >🎨 Cell Styles
+                <small style="color: #888"
+                  >bg/color/bold/italic/border/align</small
+                ></span
+              >
+            </label>
+            <label
+              class="checkbox-item"
+              title="Supports <b> <i> <u> <s> <br> tags and style attributes"
+            >
+              <input type="checkbox" id="includeRichText" checked />
+              <span
+                >📝 Rich Text
+                <small style="color: #888">HTML tags + style</small></span
+              >
+            </label>
+            <label
+              class="checkbox-item pro-disabled pro-feature"
+              data-pro="hyperlink"
+              title="💎 Pro Feature - Contact for pricing"
+            >
+              <input type="checkbox" disabled />
+              <span
+                >🔗 Hyperlinks <small class="pro-tag">Pro</small>
+                <small style="color: #888">mailto/http</small></span
+              >
+            </label>
+            <label 
+              class="checkbox-item pro-disabled pro-feature" 
+              data-pro="merge"
+              title="💎 Pro Feature - Contact for pricing"
+            >
+              <input type="checkbox" disabled />
+              <span
+                >📊 Merge Cells <small class="pro-tag">Pro</small>
+                <small style="color: #888">rowSpan/colSpan</small></span
+              >
+            </label>
+            <label 
+              class="checkbox-item pro-disabled pro-feature" 
+              data-pro="rowcol"
+              title="💎 Pro Feature - Contact for pricing"
+            >
+              <input type="checkbox" disabled />
+              <span
+                >📐 Row/Col Size <small class="pro-tag">Pro</small>
+                <small style="color: #888">height/width</small></span
+              >
+            </label>
+            <label 
+              class="checkbox-item pro-disabled pro-feature" 
+              data-pro="image"
+              title="💎 Pro Feature - Contact for pricing"
+            >
+              <input type="checkbox" disabled />
+              <span
+                >🖼️ Images <small class="pro-tag">Pro</small>
+                <small style="color: #888">base64</small></span
+              >
+            </label>
+          </div>
+          <div
+            style="
+              margin-top: 8px;
+              padding: 8px 12px;
+              background: #fef3c7;
+              border-radius: 6px;
+              font-size: 12px;
+              color: #92400e;
+            "
+          >
+            💡
+            Demo rows (3 per feature) will be inserted at the <strong>beginning</strong> of data
+          </div>
+        </div>
+
+        <!-- Pro Tooltip -->
+        <div class="pro-tooltip" id="proTooltip">
+          <div id="proTooltipText">Unlock Pro Features</div>
+          <span class="price">¥4999 / Lifetime License</span>
+        </div>
+
+        <button class="btn btn-primary" id="exportBtn" onclick="startExport()">
+          🚀 Start Export
+        </button>
+        <button class="btn btn-secondary" onclick="clearLog()">
+          🗑️ Clear Log
+        </button>
+
+        <div class="progress-container" id="progressContainer">
+          <div class="progress-bar">
+            <div class="progress-bar-fill" id="progressFill"></div>
+          </div>
+          <div class="progress-info">
+            <span class="progress-stage" id="progressStage">Preparing...</span>
+            <span id="progressPercent">0%</span>
+          </div>
+          <div class="progress-message" id="progressMessage">Initializing...</div>
+          <div class="progress-time" id="progressTime" style="display: none">
+            Elapsed: 0s
+          </div>
+          <div
+            class="progress-memory"
+            id="progressMemory"
+            style="display: none"
+          >
+            <div class="memory-bar">
+              <div class="memory-used" id="memoryUsed" style="width: 0%"></div>
+            </div>
+            <div class="memory-text">
+              Memory: <span id="memUsedHeap">0</span>MB /
+              <span id="memTotalHeap">0</span>MB
+              <span class="memory-limit"
+                >(Limit: <span id="memLimit">0</span>MB)</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="debug-log" id="debugLog">
+          <div class="log-entry info">[System] Demo environment loaded</div>
+        </div>
+      </div>
+
+      <!-- Business Card -->
+      <div
+        class="card"
+        style="
+          background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+          border: 2px solid #f59e0b;
+        "
+      >
+        <h2 style="color: #b45309">💼 Business & Consulting</h2>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+          "
+        >
+          <!-- Pro Version -->
+          <div
+            style="
+              padding: 20px;
+              background: white;
+              border-radius: 12px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              text-align: center;
+            "
+          >
+            <div style="font-size: 2rem; margin-bottom: 10px">🚀</div>
+            <div
+              style="
+                font-weight: 700;
+                color: #b45309;
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+              "
+            >
+              Pro Version
+            </div>
+            <ul
+              style="
+                text-align: left;
+                color: #666;
+                font-size: 0.9rem;
+                padding-left: 20px;
+                margin-bottom: 15px;
+              "
+            >
+              <li>✅ Custom Row/Column Size</li>
+              <li>✅ Image Embedding</li>
+              <li>✅ Hyperlinks</li>
+              <li>✅ Technical Support</li>
+            </ul>
+            <div style="color: #b45309; font-weight: 600">Contact for Pricing<br/>📧 634688344@qq.com</div>
+          </div>
+          <!-- Consulting -->
+          <div
+            style="
+              padding: 20px;
+              background: white;
+              border-radius: 12px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              text-align: center;
+            "
+          >
+            <div style="font-size: 2rem; margin-bottom: 10px">💬</div>
+            <div
+              style="
+                font-weight: 700;
+                color: #b45309;
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+              "
+            >
+              Technical Consulting
+            </div>
+            <ul
+              style="
+                text-align: left;
+                color: #666;
+                font-size: 0.9rem;
+                padding-left: 20px;
+                margin-bottom: 15px;
+              "
+            >
+              <li>📊 Big Data Export Solutions</li>
+              <li>🔧 Custom Development</li>
+              <li>📚 Technical Training</li>
+            </ul>
+            <div style="color: #b45309; font-weight: 600">Scan to Consult ↓</div>
+            <div style="margin-top: 15px; text-align: center;">
+              <img src="./assets/user/wechat.jpg" width="150" style="border-radius: 8px;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Donation Card -->
+      <div
+        class="card"
+        style="
+          background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+          border: 2px solid #ec4899;
+        "
+      >
+        <h2 style="color: #be185d">☕ Support This Project</h2>
+        <p style="color: #9d174d; margin-bottom: 20px">
+          If this project helps you, consider supporting it! Your encouragement motivates continuous improvement 💪
+        </p>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+          "
+        >
+          <!-- Star -->
+          <div
+            style="
+              padding: 20px;
+              background: white;
+              border-radius: 12px;
+              text-align: center;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <div style="font-size: 2rem; margin-bottom: 10px">⭐</div>
+            <div style="font-weight: 700; color: #be185d; margin-bottom: 10px">
+              Give a Star
+            </div>
+            <div style="color: #666; font-size: 0.85rem; margin-bottom: 15px">
+              The simplest way to support
+            </div>
+            <a
+              href="https://github.com/fulbee/Ful-ExcelExport"
+              target="_blank"
+              style="
+                display: inline-block;
+                padding: 8px 20px;
+                background: #be185d;
+                color: white;
+                text-decoration: none;
+                border-radius: 20px;
+                font-size: 0.9rem;
+              "
+              >Go to GitHub ⭐</a
+            >
+          </div>
+          <!-- Donate -->
+          <div
+            style="
+              padding: 20px;
+              background: white;
+              border-radius: 12px;
+              text-align: center;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <div style="font-size: 2rem; margin-bottom: 10px">💰</div>
+            <div style="font-weight: 700; color: #be185d; margin-bottom: 10px">
+              Buy Me a Coffee
+            </div>
+            <div style="margin-top: 10px; text-align: center;">
+              <img src="./assets/user/aliPay.jpg" width="150" style="border-radius: 8px;" />
+            </div>
+          </div>
+        </div>
+        <p
+          style="
+            text-align: center;
+            margin-top: 20px;
+            color: #9d174d;
+            font-size: 0.9rem;
+          "
+        >
+          Every Star and donation means a lot! 🙏
+        </p>
+      </div>
+    </div>
+
+    <script type="module">
+      import FulExcelExport from "./ful-excel-export.esm.js";
+
+      // Log function
+      function log(message, type = "info") {
+        const debugLog = document.getElementById("debugLog");
+        const entry = document.createElement("div");
+        entry.className = `log-entry ${type}`;
+        const time = new Date().toLocaleTimeString();
+        entry.textContent = `[${time}] ${message}`;
+        debugLog.appendChild(entry);
+        debugLog.scrollTop = debugLog.scrollHeight;
+        console.log(`[${type}] ${message}`);
+      }
+
+      window.clearLog = function () {
+        document.getElementById("debugLog").innerHTML =
+          '<div class="log-entry info">[System] Log cleared</div>';
+      };
+
+      log("Demo environment ready", "success");
+
+      const proFeatures = {
+        hyperlink: "🔗 Hyperlinks: Add clickable links to cells",
+        merge: "📐 Merge Cells: Combine multiple cells into one",
+        rowcol: "📏 Row/Col Size: Control row height and column width",
+        image: "🖼️ Images: Embed images into Excel cells",
+      };
+
+      const tooltip = document.getElementById("proTooltip");
+      const tooltipText = document.getElementById("proTooltipText");
+
+      document.querySelectorAll(".pro-feature").forEach((el) => {
+        el.addEventListener("mouseenter", (e) => {
+          const feature = el.dataset.pro;
+          tooltipText.textContent = proFeatures[feature] || "Pro Feature";
+          tooltip.classList.add("visible");
+        });
+
+        el.addEventListener("mousemove", (e) => {
+          tooltip.style.left = e.clientX + 15 + "px";
+          tooltip.style.top = e.clientY + 15 + "px";
+        });
+
+        el.addEventListener("mouseleave", () => {
+          tooltip.classList.remove("visible");
+        });
+
+        el.addEventListener("click", () => {
+          alert(
+            "💎 Pro Features\n\nIncludes: Hyperlinks, Merge Cells, Row/Col Size, Images\n\nContact: 634688344@qq.com"
+          );
+        });
+      });
+
+      window.startExport = async function () {
+        const rowCount = parseInt(document.getElementById("rowCount").value);
+        const colCount = parseInt(document.getElementById("colCount").value);
+        const fileName =
+          document.getElementById("fileName").value || "export.xlsx";
+        const includeStyles = document.getElementById("includeStyles").checked;
+        const includeRichText =
+          document.getElementById("includeRichText").checked;
+
+        const btn = document.getElementById("exportBtn");
+        const progressContainer = document.getElementById("progressContainer");
+        const progressFill = document.getElementById("progressFill");
+        const progressStage = document.getElementById("progressStage");
+        const progressPercent = document.getElementById("progressPercent");
+        const progressMessage = document.getElementById("progressMessage");
+        const progressTime = document.getElementById("progressTime");
+        const progressMemory = document.getElementById("progressMemory");
+        const memoryUsed = document.getElementById("memoryUsed");
+        const memUsedHeap = document.getElementById("memUsedHeap");
+        const memTotalHeap = document.getElementById("memTotalHeap");
+        const memLimit = document.getElementById("memLimit");
+
+        btn.disabled = true;
+        btn.textContent = "⏳ Exporting...";
+        progressContainer.classList.add("active");
+        progressTime.style.display = "block";
+        progressMemory.style.display = "block";
+
+        const startTime = Date.now();
+        const timer = setInterval(() => {
+          const elapsed = Math.floor((Date.now() - startTime) / 1000);
+          const minutes = Math.floor(elapsed / 60);
+          const seconds = elapsed % 60;
+          progressTime.textContent =
+            minutes > 0
+              ? `Elapsed: ${minutes}m ${seconds}s`
+              : `Elapsed: ${seconds}s`;
+        }, 1000);
+
+        const colNames = [
+          "Name",
+          "Age",
+          "Department",
+          "Position",
+          "Employee ID",
+          "Join Date",
+          "Salary",
+          "Email",
+          "Phone",
+          "Address",
+          "Education",
+          "Major",
+          "Hometown",
+          "Nationality",
+          "Status",
+          "Marital",
+          "Emergency Contact",
+          "Emergency Phone",
+          "Note1",
+          "Note2",
+        ];
+
+        const departments = [
+          "Engineering",
+          "Product",
+          "Design",
+          "Marketing",
+          "Finance",
+          "HR",
+        ];
+        const names = [
+          "John",
+          "Jane",
+          "Bob",
+          "Alice",
+          "Tom",
+          "Mary",
+          "David",
+          "Sarah",
+        ];
+        const positions = ["Engineer", "Manager", "Director", "Specialist", "Lead", "Assistant"];
+
+        log(`Starting export: ${rowCount.toLocaleString()} rows × ${colCount} columns`);
+        log(`File name: ${fileName}`);
+        log(`Styles: ${includeStyles ? "✓" : "✗"} | Rich Text: ${includeRichText ? "✓" : "✗"}`);
+
+        // Create exporter instance
+        const exporter = new FulExcelExport({ fileName });
+        log("Exporter created");
+
+        // Add worksheet
+        const worksheet = exporter.addWorkSheet({
+          name: "Data",
+          columnCount: colCount,
+        });
+        log(`Worksheet created: ${worksheet.name}`);
+
+        // Generate header row
+        const headerRowData = [];
+        for (let i = 0; i < colCount; i++) {
+          const cell = { value: colNames[i] || `Column${i + 1}` };
+          if (includeStyles) {
+            cell.bold = true;
+            cell.fill = "#4472C4";
+            cell.color = "#FFFFFF";
+            cell.align = "center";
+          }
+          headerRowData.push(cell);
+        }
+
+        // Generate data row
+        function generateRow(i) {
+          const row = [];
+          const name = names[i % names.length];
+          const age = 20 + (i % 40);
+          const dept = departments[i % departments.length];
+          const pos = positions[i % positions.length];
+          const email = `${name.toLowerCase()}${i}@company.com`;
+
+          for (let col = 0; col < colCount; col++) {
+            let cell = {};
+            switch (col) {
+              case 0:
+                cell = { value: `${name} ${i}` };
+                if (includeStyles && i % 5 === 0) {
+                  cell.fill = "#FFFF00";
+                  cell.bold = true;
+                }
+                break;
+              case 1:
+                cell = { value: age };
+                if (includeStyles && age > 40) {
+                  cell.color = "#FF0000";
+                }
+                break;
+              case 2:
+                cell = { value: dept };
+                break;
+              case 3:
+                cell = { value: pos };
+                if (includeStyles) {
+                  cell.italic = true;
+                }
+                break;
+              case 4:
+                cell = { value: `EMP${String(i).padStart(6, "0")}` };
+                if (includeStyles) {
+                  cell.fontFamily = "Courier New";
+                }
+                break;
+              case 5:
+                cell = {
+                  value: `2020-${String((i % 12) + 1).padStart(2, "0")}-${String((i % 28) + 1).padStart(2, "0")}`,
+                };
+                break;
+              case 6:
+                cell = { value: 5000 + (i % 20) * 1000 };
+                if (includeStyles) {
+                  cell.border = true;
+                  cell.align = "right";
+                }
+                break;
+              case 7:
+                if (includeRichText && i % 10 === 0) {
+                  cell = { value: `<b>${email}</b>` };
+                } else {
+                  cell = { value: email };
+                }
+                break;
+              case 8:
+                cell = { value: `138${String(i).padStart(8, "0").slice(-8)}` };
+                break;
+              case 9:
+                if (includeRichText && i % 7 === 0) {
+                  cell = { value: `<i>123 Main St #${i}</i>` };
+                } else {
+                  cell = { value: `123 Main St #${i}` };
+                }
+                break;
+              default:
+                cell = { value: `Data${col}-${i}` };
+            }
+            row.push(cell);
+          }
+          return row;
+        }
+
+        // Progress callback
+        exporter.onProgress((percent, stage, message, memory) => {
+          progressFill.style.width = percent + "%";
+          progressPercent.textContent = percent + "%";
+
+          const stageNames = {
+            init: "Initializing",
+            building: "Building",
+            compressing: "Compressing",
+            done: "Done",
+            error: "Error",
+          };
+          progressStage.textContent = stageNames[stage] || stage;
+          progressMessage.textContent = message;
+          log(`${stageNames[stage] || stage}: ${message}`);
+
+          if (memory) {
+            const usedHeap = parseFloat(memory.usedHeap) || 0;
+            const totalHeap = parseFloat(memory.totalHeap) || 0;
+            const limit = parseFloat(memory.limit) || totalHeap;
+            const memPercent = limit > 0 ? Math.min(100, (usedHeap / limit) * 100) : 0;
+
+            memUsedHeap.textContent = usedHeap;
+            memTotalHeap.textContent = totalHeap;
+            memLimit.textContent = limit;
+            memoryUsed.style.width = memPercent + "%";
+          }
+        });
+
+        try {
+          const PAGE_SIZE = 1000;
+          const totalPages = Math.ceil((rowCount + 1) / PAGE_SIZE);
+          log(`Pages: ${totalPages} (${PAGE_SIZE} rows per page)`);
+
+          // Generate and write data page by page
+          for (let page = 0; page < totalPages; page++) {
+            const pageData = [];
+            const startIdx = page * PAGE_SIZE;
+            const endIdx = Math.min(startIdx + PAGE_SIZE, rowCount + 1);
+
+            for (let idx = startIdx; idx < endIdx; idx++) {
+              if (idx === 0) {
+                pageData.push(headerRowData);
+              } else {
+                pageData.push(generateRow(idx - 1));
+              }
+            }
+
+            await worksheet.addRows(pageData);
+            
+            // Log every 10 pages
+            if ((page + 1) % 10 === 0 || page === totalPages - 1) {
+              log(`Written ${page + 1} / ${totalPages} pages`);
+            }
+          }
+          log("Data write complete", "success");
+
+          log("Starting compression...");
+          const result = await exporter.export();
+
+          console.log("Export successful:", result);
+          log(`✅ Export successful! Rows: ${result.rows.toLocaleString()}, Size: ${result.sizeMB}MB`, "success");
+          alert(
+            `Export Successful!\nRows: ${result.rows.toLocaleString()}\nSheets: ${
+              result.sheets
+            }\nFile Size: ${result.sizeMB} MB`
+          );
+        } catch (error) {
+          console.error("Export failed:", error);
+          log(`❌ Export failed: ${error.message}`, "error");
+          alert("Export failed: " + error.message);
+        } finally {
+          clearInterval(timer);
+          btn.disabled = false;
+          btn.textContent = "🚀 Start Export";
+        }
+      };
+    </script>
+  </body>
+</html>
+
